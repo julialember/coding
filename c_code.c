@@ -13,6 +13,7 @@ double atof(char s[]){
     int posit, sign; 
     double val; 
     for (posit = 0; isspace(s[posit]); posit++); 
+    if (s[posit] == '\0') return 0.0;
     sign = s[posit] == '-' ? -1 : 1; 
     if (s[posit] == '-' || s[posit] == '+') posit++; 
     for (val = 0; isdigit(s[posit]); val = val * 10 + (s[posit++] - '0')); 
