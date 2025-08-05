@@ -6,9 +6,9 @@
 int buffer[MAXLEN]; 
 int buf_len = 0; 
 int getint(int*); 
-int getints(int *); 
 int getch(void);
 void ungetch(int);
+void bubble_sort(int *, int*);
 
 int main(){
     printf("let me know n: ");
@@ -18,28 +18,27 @@ int main(){
         return 1;
     }
     int *ptr = malloc(sizeof(int)*n);
-    printf("let me know n numbers: "); 
-    if (!getints(ptr)) {
-        printf("error while readind numbers");
-    }
+    for (int i = 0; i < n; i++) ptr[i] = n - i; 
+    
+    bubble_sort(ptr, ptr + n - 1);
+    for (int i = 0; i < n; i++) printf("%d", ptr[i]);
+    free(ptr);
+    return 0; 
 }
 
-int getints(int *ptr){
-    int c, i = 0; 
-    while ((c = getch()) != '\n'){
-        while ((isspace(c))) c = getch(); 
-        if (!isdigit(c) && c!= EOF) {
-            ungetch(c);
-            return 0;
-        }
-        while (isdigit(c)){
-            ptr[i] = ptr[i] * 10 + (c - '0');
-            c = getch();
-        }
-        i++; 
-    }
-    if (c != EOF) ungetch(c);
-    return c;
+void  bubble_sort(int *ptr, int *end) {
+    int swapped; 
+    do {
+        swapped = 0;
+        for (int *i =  ptr; i < end; i++)
+            if (*(i + 1) < *i) {
+                int temp = *i; 
+                *i = *(i + 1);
+                *(i + 1) = temp; 
+                swapped = 1; 
+            }
+        end--;
+    } while (swapped);
 }
 
 int getint(int *ptr) {
