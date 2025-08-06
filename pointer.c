@@ -68,3 +68,38 @@ void ungetch(int c){
     if (buf_len >= MAXLEN) printf("the stack is full");
     else buffer[buf_len++] = c;
 } 
+
+struct Node {
+    int data;
+    struct Node *next; 
+};
+
+void addNode(struct Node *self, struct Node *next){
+    if (!self->next) self->next = next;
+    else {
+        self = self->next;
+        while (self->next) self = self->next; 
+        self->next = next;
+    }
+}
+
+struct Node* createNode(int data) {
+    struct Node* node = malloc(sizeof(struct Node));
+    node->data = data; 
+    node->next = NULL;
+    return node; 
+}
+
+void printList(struct Node *self){
+    if (!self->next){
+        printf("the stack is empty");
+        return;
+    }
+    printf("%d\n", self->data);
+    while (self->next) {
+        printf("%d\n", self->next->data);
+        self = self->next; 
+    }
+}
+
+
