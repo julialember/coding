@@ -102,4 +102,26 @@ void printList(struct Node *self){
     }
 }
 
-
+void nxm(){
+    int n, m; 
+    printf("let me know m and n: ");
+    scanf("%d", &n); scanf("%d", &m);
+    int **ptr = malloc(sizeof(int*)* n); 
+    for (int i = 0; i < n; i++) 
+        ptr[i] = malloc(sizeof(int)* m);
+    printf("let me know numbers: "); 
+    for (int i = 0; i < n; i++)
+        for (int q = 0; q < m; q++) scanf("%d", (*(ptr + i) + q));  
+    int summ = 0;
+    printf("summ of lines:\n");
+    for (int i = 0; i < n; i++){
+        for (int q = 0; q < m; q++)
+            summ +=  *(*(ptr + i) + q); 
+        printf("%d: %d\n", i+1, summ); 
+        summ = 0; 
+    }
+    for (int i = 0; i<n; i++){
+        free(ptr[i]); 
+    }
+    free(ptr); 
+}
