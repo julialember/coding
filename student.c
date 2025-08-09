@@ -89,13 +89,40 @@ void freeStudent(Student* st) {
     free(st);
 }
 
+void addGrades(Student* st) {
+    if (!st) {
+        return; 
+    }
+    float* newGrades = NULL;
+    printf("let me know new grades:\n");
+    int len = get_floats(&newGrades);
+    if (!newGrades || len < 0) {
+        printf("error reading new grades");
+        return; 
+    }
+    float* tempo = realloc(st->grades, sizeof(float) * (st->grades_count + len)); 
+    if (!tempo) {
+        printf("problem with memory allocated");
+        free(newGrades);
+        return;
+    } 
+    st->grades = tempo; 
+    for (int i = 0; i < len; i++) st->grades[st->grades_count+i] = newGrades[i];
+    free(newGrades); 
+    st->grades_count += len;
+}
+
 void printStudent(Student* st){
+    if (!st) return; 
     printf("name: %s\nage: %d\ngrades:\n", st->name, st->age);
     for (int i = 0; i < st->grades_count; i++) printf("%g ", (st->grades)[i]);
+    printf("\n");
 }
 
 int main() {
     Student* st = createStudent();
     printStudent(st);
-    freeStudent(st);
+    addGrades(st);
+    printStudent(st);
+    freeStudent(st); 
 }
