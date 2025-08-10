@@ -25,12 +25,32 @@ void cmpFiles(FILE* f, FILE* s) {
     if (!f || !s) return;
     char* fir = NULL; 
     char* sec = NULL;
-    int fl = getfline(&fir, f, MAXLEN);
-    int fs = getfline(&sec, s, MAXLEN);
-    if (fl != fs) printf("%s", fir?fir:sec?sec:"files are the same"); 
+    for (int fl = getfline(&fir, f, MAXLEN),
+    fs = getfline(&sec, s, MAXLEN);;){
+        if (fl == -1 || fs == -1 || fs != fl){
+            printf("%s\n", fir?fir:sec?sec:"unknow setuation\n");
+            break;
+        } 
+        int i = 0; 
+        for (; i < fl && fir[i] == sec[i]; i++); 
+        if (fir[i] != '\0') {
+            printf("%s", fir); 
+            break;
+        }
+        fl = getfline(&fir, f, MAXLEN); 
+        fs = getfline(&sec,s, MAXLEN); 
+        if (fl == -1 && fs == -1) {
+            printf("files are the same\n");
+            free(fir);
+            free(sec); 
+            break;
+        }
+    }
+    
 }
+
 int main() {
     FILE* text1 = fopen("text1.txt", "r");
     FILE* text2 = fopen("text.txt", "r");
-    cmpFiles(text1, text2);
+    cmpFiles(text1, text2); 
 }
