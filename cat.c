@@ -15,15 +15,15 @@ void printerr(char* fmt, ...) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) printerr("need at least 2 args");
+    if (argc < 2) goto fin;
     int n;
     char buf[BUFSIZ]; 
     int readed;
     for(int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-") == 0) while (1) {
+        if (strcmp(argv[i], "-") == 0) fin: while (1) {
             if ((readed = read(0, buf, sizeof buf)) < 0) printerr("something wrong"); 
             if (readed == 0) {
-                if (++i >= argc) exit(0); 
+                if (++i>=argc) return 0;
                 break;
             } 
             if (write(1, buf, readed) != readed) printerr("error with write");
@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
             if (write(1, buf, readed) != readed) printerr("cat: error with writing");
         } 
         if (readed < 0) printerr("error with reading file: %s", argv[i]); 
-        close(n); 
+        if (n!=-1) close(n); 
     }
     return 0;
 }
