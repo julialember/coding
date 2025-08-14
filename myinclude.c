@@ -35,8 +35,37 @@ double atof(char *s) {
     return (answer + dpart) *sign * exppart; 
 }
 
+//-------------------------------------------------------
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void bbleSort(int nums[], int biggestIndex) {
+    for (int i = 0; i < biggestIndex; i++) 
+        for (int q = 0; q <= biggestIndex - i; q++) 
+            if (nums[q] > nums[q+1]) swap(&nums[q], &nums[q+1]);
+}
+
+void qSort(int nums[], int l, int h) {
+    if (l>=h)return;
+    int pivot = nums[(l + h)/2];
+    int i = l, q = h; 
+    while (i <= q) {
+        while (nums[i++] < pivot); 
+        while (nums[q--] > pivot);
+        if (i <= q) swap(&nums[i++], &nums[q--]);
+    }
+    qSort(nums, l, q);
+    qSort(nums, i, h);
+}
+
+//-------------------------------------------------------
+
 int main() {
-    char s[10]; 
-    for(int i = 0; (s[i] = getchar()) != '\n'; i++); 
-    printf("%g", atof(s));
+    int nums[] = {10, 9, 8, 7, 6, 5, 4, 3, 1, 2};
+    qSort(nums, 0, 9);
+    for (int i = 0; i < 10; i++) printf("%d ", nums[i]);
 }
