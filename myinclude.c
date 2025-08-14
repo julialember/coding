@@ -1,8 +1,11 @@
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-double atof(char *s) {
+double myatof(char *s) {
     double answer = 0;
     double dpart = 0;
     double exppart = 1;
@@ -35,8 +38,6 @@ double atof(char *s) {
     return (answer + dpart) *sign * exppart; 
 }
 
-//-------------------------------------------------------
-
 void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
@@ -62,10 +63,23 @@ void qSort(int nums[], int l, int h) {
     qSort(nums, i, h);
 }
 
-//-------------------------------------------------------
+int getfline(char**answer, FILE* f, int maxlen) {
+    if (!f || maxlen<=0) return -1;
+    if (*answer) free(*answer); 
+    if (!(*answer = malloc(maxlen))) return -1;
+    int len = 0;
+    for (int c = 0; ( c = getc(f) ) != EOF && c != '\n' && c != '\0' && len <= maxlen-1;) (*answer)[len++] = c;
+    while (isspace((unsigned char)(*answer)[len])) len--;
+    if (len == 0) return 0; 
+    char* temp = realloc(*answer, len + 1);
+    if (temp) *answer = temp; 
+    (*answer)[++len] = '\0';
+    return len;  
+}
 
 int main() {
-    int nums[] = {10, 9, 8, 7, 6, 5, 4, 3, 1, 2};
-    qSort(nums, 0, 9);
-    for (int i = 0; i < 10; i++) printf("%d ", nums[i]);
+    FILE* f = fopen("text.txt", "r"); 
+    char* answer = NULL;
+    printf("the len is %d\n", getfline(&answer, f, 100));
+    printf("%s", answer);
 }
