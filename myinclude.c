@@ -63,6 +63,41 @@ void qSort(int nums[], int l, int h) {
     qSort(nums, i, h);
 }
 
+int getflinebyname(char**answer, const char*filename, int maxlen) {
+    if (!filename || maxlen <= 0) return -1; 
+    if (*answer) {
+        free(*answer); 
+        *answer = NULL;
+    }
+    int n = open(filename, O_RDONLY); 
+    if (n == -1) {
+        fprintf(stderr, "error with file open\n");
+        return -1; 
+    }
+    if (!(*answer = malloc(maxlen))) {
+        close(n); 
+        fprintf(stderr, "problems with mem allocate\n");
+        return -1; 
+    }
+    int len = read(n, *answer, maxlen-1); 
+    if (len < 0) return -1;  
+    else if (len == 0) {
+        free(*answer); 
+        return -1;
+    }
+    for(int l = 0; l < len; l++) if ((*answer)[l] == '\n' || (*answer)[l] == '\0') len = l;
+    char* temp = realloc(*answer, len);
+    if (temp) *answer = temp;
+    else {
+        free(*answer); 
+        close(n);
+        fprintf(stderr, "problems with mem realloccated"); 
+    }
+    (*answer)[len] = '\0';
+    close(n);
+    return len;      
+}
+
 int getfline(char**answer, FILE* f, int maxlen) {
     if (!f || maxlen<=0) return -1;
     if (*answer) free(*answer); 
@@ -77,9 +112,12 @@ int getfline(char**answer, FILE* f, int maxlen) {
     return len;  
 }
 
+void cmpFiles(const char* f1, const char* f2) {
+    
+}
+
 int main() {
-    FILE* f = fopen("text.txt", "r"); 
-    char* answer = NULL;
-    printf("the len is %d\n", getfline(&answer, f, 100));
-    printf("%s", answer);
+    char* buffer = NULL;
+    printf("the len of the line: %d\n", getflinebyname(&buffer, "text.txt", 100));
+    printf("%s", buffer); 
 }
