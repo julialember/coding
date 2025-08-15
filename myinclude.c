@@ -112,12 +112,33 @@ int getfline(char**answer, FILE* f, int maxlen) {
     return len;  
 }
 
-void cmpFiles(const char* f1, const char* f2) {
-    
+int getlinebynumber(char*buffer, char**to, int number) {
+    if (!buffer || number <= 0) return -1;
+    char* start= buffer;  
+    for (; *buffer != '\0' && number > 0; buffer++) if (*buffer == '\n') {
+        if (--number > 0) start = buffer+1;
+        else buffer--;
+    }
+    if (*to) {
+        free(*to);
+        *to = NULL; 
+    }
+    *to = malloc(buffer-start + 1);
+    if (!*to) {
+        fprintf(stderr, "problems with mem allocate");
+        return -1;
+    }
+    for (int len = 0; len < buffer-start; len++) (*to)[len] = start[len];
+    (*to)[buffer-start] = '\0'; 
+    return buffer-start;
 }
 
 int main() {
     char* buffer = NULL;
-    printf("the len of the line: %d\n", getflinebyname(&buffer, "text.txt", 100));
-    printf("%s", buffer); 
+    int n = open("text.txt", O_RDONLY); 
+    char buf[BUFSIZ];
+    int q = read(n, buf, 100);
+    for (int i = 1; i < 4; i++) {
+    printf("line len = %d\n", getlinebynumber(buf, &buffer, i));
+    printf("%s\n", buffer);}; 
 }
