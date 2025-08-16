@@ -133,12 +133,21 @@ int getlinebynumber(char*buffer, char**to, int number) {
     return buffer-start;
 }
 
+int getnextline(char**to, char*buffer, int maxlen) {
+    if (!buffer || maxlen <= 0) return -1;
+    int len = 0; 
+    if (*to) {
+        free(*to);
+        *to = NULL;
+    }
+    *to = malloc(maxlen);
+    for (; buffer[len] != '\n' && buffer[len] != '\0' && len < maxlen - 1; len++) (*to)[len] = buffer[len];
+    char* temp = realloc(*to, len + 1);
+    if (temp) *to = temp; 
+    (*to)[len] = '\0';
+    return len;
+}
+
 int main() {
-    char* buffer = NULL;
-    int n = open("text.txt", O_RDONLY); 
-    char buf[BUFSIZ];
-    int q = read(n, buf, 100);
-    for (int i = 1; i < 4; i++) {
-    printf("line len = %d\n", getlinebynumber(buf, &buffer, i));
-    printf("%s\n", buffer);}; 
+
 }
