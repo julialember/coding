@@ -70,6 +70,37 @@ void printdir(char* dirname, int deep) {
     closedir(dir);
 }
 
+void print_size(char*name) {
+    if (!name) return; 
+    struct stat st;
+    if(stat(name, &st) == -1) {
+        fprintf(stderr, "error with file: %s\n", name);
+        return;
+    } else printf("sizeof '%s': %lld\n", name, (long long)st.st_size);
+} 
+
+void print_last() {
+    #include <time.h>
+    DIR* dir = opendir(".");
+    if (!dir) {
+        fprintf(stderr, "error with open '.' dir");
+        return;
+    }
+    time_t now = time(NULL); 
+    struct dirent* dd;
+    struct stat st;
+    while ((dd = readdir(dir)) != NULL) {
+        if (stat(dd->d_name, &st) == -1) {
+            fprintf(stderr, "error with stat file: '%s': %s\n", dd->d_name, strerror(errno) );
+            continue;
+        }
+        if (difftime(now, st.st_mtime) < 7 * 24 * 3600) {
+            printf("%s: %s", dd->d_name, ctime(&st.st_mtime));
+        }
+    }
+    closedir(dir);
+}
+
 int main(int argc, char* argv[]){
-    printext(argv[1], argv[2],  5);
+    print_last();
 }
