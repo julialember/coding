@@ -101,6 +101,26 @@ void print_last() {
     closedir(dir);
 }
 
+void thebiggest() {
+    DIR* dir = opendir(".");
+    if (!dir) {
+        fprintf(stderr, "error with open '.' directory\n");
+        return;
+    }
+    long long biggest = 0;
+    struct dirent* d;
+    struct stat st; 
+    while ((d = readdir(dir)) != NULL) {
+        if (lstat(d->d_name, &st) == -1) {
+            fprintf(stderr, "error with stat file: '%s': %s\n", d->d_name, strerror(errno));
+            continue; 
+        }
+        if (S_ISREG(st.st_mode) && st.st_size > biggest) biggest = st.st_size; 
+    }
+    printf("%lld", biggest);
+    closedir(dir);
+}
+
 int main(int argc, char* argv[]){
-    print_last();
+    thebiggest();
 }
