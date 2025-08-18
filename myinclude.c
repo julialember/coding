@@ -5,6 +5,28 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+double myatof(char*);
+
+void swap(int*, int*);
+void bbleSort(int[], int); 
+void qSort(int[], int, int); 
+
+int getflinebyname(char**, const char*, int);
+int getfline(char**, FILE*, int);
+int getlinebynumber(char*, char**, int); 
+int getnextline(char**, char*, int);
+
+void printext(char*, char*, int); 
+void print_size(char*);
+void printdir(char*, int);
+void ptint_last();
+void thebiggest();
+
+
+int main(int argc, char* argv[]) {
+    
+}
+
 double myatof(char *s) {
     double answer = 0;
     double dpart = 0;
@@ -103,7 +125,8 @@ int getfline(char**answer, FILE* f, int maxlen) {
     if (*answer) free(*answer); 
     if (!(*answer = malloc(maxlen))) return -1;
     int len = 0;
-    for (int c = 0; ( c = getc(f) ) != EOF && c != '\n' && c != '\0' && len <= maxlen-1;) (*answer)[len++] = c;
+    for (int c = 0; ( c = getc(f) ) != EOF && c != '\n' && c != '\0' && len <= maxlen-1;) 
+        (*answer)[len++] = c;
     while (isspace((unsigned char)(*answer)[len])) len--;
     if (len == 0) return 0; 
     char* temp = realloc(*answer, len + 1);
@@ -270,6 +293,3 @@ void thebiggest() {
 }
 
 
-int main(int argc, char* argv[]) {
- 
-}
