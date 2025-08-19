@@ -1,4 +1,6 @@
 #include <ctype.h>
+#include <stddef.h>
+#include <sys/mman.h>
 #include <math.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -22,9 +24,92 @@ void printdir(char*, int);
 void ptint_last();
 void thebiggest();
 
+void* mymalloc(unsigned);
+void myfree(void*);
+void* myrealloc(void*, unsigned); 
+union header;
+static union header *coremore(size_t);
 
 int main(int argc, char* argv[]) {
     
+}
+
+typedef long align; 
+
+union header {
+    struct {
+        union header *ptr; 
+        unsigned size;
+    }s;
+    align x;
+};
+
+static union header base; 
+static union header *freep = NULL;
+
+
+void *mymalloc(unsigned need) {
+    union header *p, *prevp;
+    unsigned nunits;
+
+    nunits = (need + sizeof (union header) -1 ) / sizeof(union header) + 1;
+    if (freep == NULL) {
+        base.s.ptr = freep = prevp = &base;
+        base.s.size = 0;
+    };
+    prevp = freep; 
+    for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
+        if (p->s.size >= nunits) {
+            if (p->s.size == nunits) {
+                prevp->s.ptr = p->s.ptr; 
+            } else {
+                p->s.size -= nunits;
+                p += p->s.size; 
+                p->s.size = nunits;
+            }
+            freep = prevp;
+            return (void *)(p+1);
+        }
+        if (p == freep){
+            if ((p = coremore(nunits)) == NULL) {
+                return NULL;
+            }
+        }
+    }
+}
+
+#define NALLOC 1024 
+#define PAGE_SIZE 4096
+
+static union header* coremore(size_t nu) {
+    if (nu < NALLOC)
+        nu = NALLOC;
+    size_t size_bytes = nu * sizeof(union header);
+    size_bytes = (size_bytes + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+    void *vp = mmap(
+            NULL,
+            size_bytes,
+            PROT_READ | PROT_WRITE, 
+            MAP_PRIVATE | MAP_ANONYMOUS,
+            -1, 0 );
+    if (vp == MAP_FAILED) return NULL; 
+    union header *up = (union header*)vp;
+    up->s.size = size_bytes / sizeof(union header);
+    myfree((void*)(up+1));
+    return freep;
+}
+
+void myfree(void* ap) {
+    union header* bp, *p;
+    bp = (union header*)ap-1;
+    for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr) {
+        if(p>= p->s.ptr && (bp > p || bp < p->s.ptr)) break;
+    }
+    if (bp + bp->s.size == p->s.ptr) {
+        bp->s.size += p->s.ptr->s.size;
+        bp->s.ptr = p->s.ptr->s.ptr;
+    } else p->s.ptr = bp;
+    freep = p;
 }
 
 double myatof(char *s) {
